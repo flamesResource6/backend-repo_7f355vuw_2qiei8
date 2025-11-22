@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_name }} – SonicWave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="page-home">
+  <!-- Outer-space layered background: base gradient + starfield + nebula blobs + cursor blob -->
+  <div class="space-background">
+    <div class="space-stars" id="space-stars"></div>
+    <div class="gradient-layer">
+      <div class="blob nebula one"></div>
+      <div class="blob nebula two"></div>
+      <div class="blob nebula three"></div>
+      <div class="cursor-blob" id="cursor-blob"></div>
+      <div class="shooting-star" id="shooting-star"></div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">⚡ SonicWave</div>
+      <nav class="menu">
+        <button class="menu-item active" data-page="home">🏠 Home</button>
+        <button class="menu-item" data-page="library">🎵 Library</button>
+        <button class="menu-item" data-page="playlists">📜 Playlists</button>
+        <button class="menu-item" data-page="favorites">💜 Favorites</button>
+        <button class="menu-item" data-page="history">⏱ History</button>
+        <a class="menu-item" href="/admin">🛠 Admin</a>
+      </nav>
+    </aside>
+
+    <main id="main-content" class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Bottom Player Bar -->
+  <div class="player-bar" id="player-bar">
+    <div class="now-playing">
+      <div class="thumb gradient"></div>
+      <div class="meta">
+        <div id="np-title">No song selected</div>
+        <div id="np-artist" class="muted">—</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="btn-prev">⏮</button>
+      <button id="btn-play" class="primary">▶</button>
+      <button id="btn-next">⏭</button>
+      <button id="btn-shuffle">🔀</button>
+      <button id="btn-repeat">🔁</button>
+    </div>
+    <div class="timeline">
+      <span id="cur-time">0:00</span>
+      <input type="range" id="progress" min="0" max="100" value="0" />
+      <span id="dur-time">0:00</span>
+    </div>
+    <div class="volume">
+      🔊 <input type="range" id="volume" min="0" max="1" step="0.01" value="1" />
+    </div>
+    <audio id="audio"></audio>
+  </div>
+
+  <!-- Nayara Mascot -->
+  <div id="nayara-mascot" class="nayara">
+    <img src="{{ url_for('static', filename='img/nayara.png') }}" alt="Nayara mascot" />
+    <div class="bubble" id="nayara-bubble">Hi, I’m Nayara, your data-structures DJ.</div>
+  </div>
+
+  <!-- Onboarding Overlay -->
+  <div id="onboarding" class="onboarding hidden">
+    <div class="onboarding-card">
+      <img class="nayara-large" src="{{ url_for('static', filename='img/nayara.png') }}" alt="Nayara" />
+      <div class="bubble large">This player is powered by linked lists, stacks, queues, trees and graphs.</div>
+      <div class="bubble large">Choose a song and I’ll fly next to it!</div>
+      <button id="onboarding-close" class="btn">Got it</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@splinetool/viewer@1.9.65/build/spline-viewer.js"></script>
+  <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+</body>
+</html>

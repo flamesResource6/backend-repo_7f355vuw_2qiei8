@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="section">
+  <h1>Admin</h1>
+  <form action="/admin/login" method="post" class="admin-login">
+    <input type="password" name="password" placeholder="Password (default: sonicwave123)" />
+    <button class="btn">Login</button>
+  </form>
+
+  <div class="admin-actions">
+    <form action="/admin/rescan" method="post"><button class="btn">Rescan Folder</button></form>
+  </div>
+
+  <div class="admin-list">
+    {% for s in songs %}
+    <div class="admin-row">
+      <div>
+        <strong>{{ s.title }}</strong> — {{ s.artist }} • {{ s.genre }} • {{ s.year }}
+      </div>
+      <div class="admin-row-actions">
+        <form action="/admin/songs/{{ s.song_id }}/edit" method="post">
+          <input type="text" name="title" placeholder="Title" value="{{ s.title }}" />
+          <input type="text" name="artist" placeholder="Artist" value="{{ s.artist }}" />
+          <input type="text" name="album" placeholder="Album" value="{{ s.album }}" />
+          <input type="text" name="genre" placeholder="Genre" value="{{ s.genre }}" />
+          <input type="number" name="year" placeholder="Year" value="{{ s.year }}" />
+          <button class="btn small">Save</button>
+        </form>
+        <form action="/admin/songs/{{ s.song_id }}/delete" method="post">
+          <button class="btn small danger">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

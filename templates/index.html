@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Discover Music</h1>
+    <p class="subtitle">Powered by SLL, DLL, Stack, Queue, Tree, Graph & Multi-Linked List</p>
+    <div class="search">
+      <input id="search" type="text" placeholder="Search by title..." />
+    </div>
+  </div>
+  <spline-viewer url="https://prod.spline.design/er66D6jbuo0hIjmn/scene.splinecode" class="spline-cover"></spline-viewer>
+</section>
+
+<section class="section" id="section-genres">
+  <h2>By Genre</h2>
+  <div class="genres" id="genres">
+    {% for g in genres %}
+    <button class="genre-pill" data-genre="{{ g }}">{{ g }}</button>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="section-all">
+  <h2>All Songs</h2>
+  <div class="grid" id="song-grid">
+    {% for s in songs %}
+    <div class="song-card" data-id="{{ s.song_id }}">
+      <div class="thumb gradient"></div>
+      <div class="info">
+        <div class="title">{{ s.title }}</div>
+        <div class="meta">{{ s.artist }} • {{ s.genre }} • {{ s.year }}</div>
+      </div>
+      <div class="actions">
+        <button class="btn small play" data-id="{{ s.song_id }}">▶</button>
+        <button class="btn small queue" data-id="{{ s.song_id }}">➕ Queue</button>
+        <button class="btn small fav" data-id="{{ s.song_id }}">💜</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="section-history">
+  <h2>Recently Played</h2>
+  <div class="grid small" id="history-grid">
+    {% for s in history %}
+    <div class="song-chip" data-id="{{ s.song_id }}">{{ s.title }}</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="section-reco">
+  <h2>Recommended for You</h2>
+  <div class="grid" id="reco-grid">
+    <!-- Will be filled dynamically when a song is playing -->
+  </div>
+</section>
+{% endblock %}
