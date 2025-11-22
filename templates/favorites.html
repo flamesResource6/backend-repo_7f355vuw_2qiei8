@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="section">
+  <h1>Favorites</h1>
+  <p class="subtitle">Your starred tracks live here. Toggle hearts on any song to curate this view.</p>
+  <div class="grid" id="fav-grid">
+    {% for s in songs %}
+    <div class="song-card" data-id="{{ s.song_id }}">
+      <div class="thumb gradient"></div>
+      <div class="info">
+        <div class="title">{{ s.title }}</div>
+        <div class="meta">{{ s.artist }} • {{ s.genre }} • {{ s.year }}</div>
+      </div>
+      <div class="actions">
+        <button class="btn small play" data-id="{{ s.song_id }}">▶</button>
+        <form action="/api/playlists/Favorites/add/{{ s.song_id }}" method="post" style="display:inline"><button class="btn small">➕ Add to Favorites playlist</button></form>
+        <button class="btn small fav" data-id="{{ s.song_id }}">💜</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if not songs or songs|length == 0 %}
+  <div class="empty-state">No favorites yet. Tap the heart on any song.</div>
+  {% endif %}
+</section>
+{% endblock %}

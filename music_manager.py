@@ -163,6 +163,19 @@ class MusicLibraryManager:
         self.graph.remove_song(song_id)
 
     # -----------------------
+    # Favorites
+    # -----------------------
+    def toggle_favorite(self, song_id: int) -> Optional[bool]:
+        song = self._song_index.get(song_id)
+        if not song:
+            return None
+        song.is_favorite = not song.is_favorite
+        return song.is_favorite
+
+    def get_favorites(self) -> List[Song]:
+        return [s for s in self.get_all_songs() if s.is_favorite]
+
+    # -----------------------
     # Genres
     # -----------------------
     def get_all_genres(self) -> List[str]:
@@ -190,6 +203,9 @@ class MusicLibraryManager:
     def delete_playlist(self, name: str) -> None:
         if name in self.playlists:
             del self.playlists[name]
+
+    def list_playlists(self) -> List[str]:
+        return sorted(self.playlists.keys(), key=lambda s: s.lower())
 
     def add_song_to_playlist(self, name: str, song_id: int) -> None:
         self.create_playlist(name)

@@ -74,6 +74,33 @@ async def admin(request: Request):
     )
 
 
+@app.get("/favorites", response_class=HTMLResponse)
+async def favorites_page(request: Request):
+    favs = manager.get_favorites()
+    return templates.TemplateResponse(
+        "favorites.html",
+        {"request": request, "songs": favs, "app_name": "SonicWave"},
+    )
+
+
+@app.get("/playlists", response_class=HTMLResponse)
+async def playlists_page(request: Request):
+    names = manager.list_playlists()
+    return templates.TemplateResponse(
+        "playlists.html",
+        {"request": request, "playlists": names, "app_name": "SonicWave"},
+    )
+
+
+@app.get("/playlists/{name}", response_class=HTMLResponse)
+async def playlist_detail_page(request: Request, name: str):
+    songs = manager.get_playlist_songs(name)
+    return templates.TemplateResponse(
+        "playlist_detail.html",
+        {"request": request, "playlist_name": name, "songs": songs, "app_name": "SonicWave"},
+    )
+
+
 # -----------------------------
 # API routes – Library
 # -----------------------------
@@ -121,6 +148,54 @@ async def api_queue():
 async def api_recommendations(song_id: int):
     ids = manager.get_similar_songs(song_id)
     return [manager.get_song_by_id(i).to_dict() for i in ids if manager.get_song_by_id(i)]
+
+
+# -----------------------------
+# API routes – Favorites
+# -----------------------------
+@app.get("/api/favorites")
+async def api_favorites():
+    return [s.to_dict() for s in manager.get_favorites()]
+
+
+@app.post("/api/favorites/toggle/{song_id}")
+async def api_favorite_toggle(song_id: int):
+    val = manager.toggle_favorite(song_id)
+    if val is None:
+        raise HTTPException(status_code=404, detail="Song not found")
+    return {"status": "ok", "is_favorite": val}
+
+
+# -----------------------------
+# API routes – Playlists
+# -----------------------------
+@app.get("/api/playlists")
+async def api_playlists():
+    return manager.list_playlists()
+
+
+@app.post("/api/playlists")
+async def api_create_playlist(name: str = Form(...)):
+    manager.create_playlist(name)
+    return RedirectResponse(url=f"/playlists/{name}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/api/playlists/{name}/delete")
+async def api_delete_playlist(name: str):
+    manager.delete_playlist(name)
+    return RedirectResponse(url="/playlists", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/api/playlists/{name}/add/{song_id}")
+async def api_playlist_add_song(name: str, song_id: int):
+    manager.add_song_to_playlist(name, song_id)
+    return RedirectResponse(url=f"/playlists/{name}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.post("/api/playlists/{name}/remove/{song_id}")
+async def api_playlist_remove_song(name: str, song_id: int):
+    manager.remove_song_from_playlist(name, song_id)
+    return RedirectResponse(url=f"/playlists/{name}", status_code=status.HTTP_303_SEE_OTHER)
 
 
 # -----------------------------

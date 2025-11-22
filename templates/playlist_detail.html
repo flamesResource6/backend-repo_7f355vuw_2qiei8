@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="section">
+  <h1>Playlist: {{ playlist_name }}</h1>
+  <div class="toolbar">
+    <form action="/api/playlists/{{ playlist_name }}/delete" method="post" onsubmit="return confirm('Delete this playlist?')">
+      <button class="btn danger">Delete Playlist</button>
+    </form>
+  </div>
+
+  <h3>Add songs</h3>
+  <div class="grid small" id="all-songs-grid">
+    {% for s in songs %}{% endfor %}
+  </div>
+  <div class="grid" id="playlist-grid">
+    {% for s in songs %}
+    <div class="song-card" data-id="{{ s.song_id }}">
+      <div class="thumb gradient"></div>
+      <div class="info">
+        <div class="title">{{ s.title }}</div>
+        <div class="meta">{{ s.artist }} • {{ s.genre }} • {{ s.year }}</div>
+      </div>
+      <div class="actions">
+        <button class="btn small play" data-id="{{ s.song_id }}">▶</button>
+        <form action="/api/playlists/{{ playlist_name }}/remove/{{ s.song_id }}" method="post" style="display:inline"><button class="btn small">✖ Remove</button></form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    // Load all songs for add-to-playlist actions
+    fetch('/api/songs').then(r=>r.json()).then(list=>{
+      const grid = document.getElementById('all-songs-grid');
+      if(!grid) return;
+      if(!list.length){ grid.innerHTML = '<div class="empty-state">No songs found.</div>'; return; }
+      list.forEach(s=>{
+        const el = document.createElement('div');
+        el.className = 'song-chip';
+        el.innerHTML = `${s.title}`;
+        el.addEventListener('click', ()=>{
+          const f = document.createElement('form');
+          f.method = 'post';
+          f.action = `/api/playlists/{{ playlist_name }}/add/${s.song_id}`;
+          document.body.appendChild(f); f.submit();
+        });
+        grid.appendChild(el);
+      })
+    });
+  </script>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="section">
+  <h1>Playlists</h1>
+  <form action="/api/playlists" method="post" class="inline-form">
+    <input type="text" name="name" placeholder="New playlist name" required />
+    <button class="btn">Create</button>
+  </form>
+
+  <div class="playlist-list">
+    {% if not playlists or playlists|length==0 %}
+    <div class="empty-state">No playlists yet. Create one above.</div>
+    {% else %}
+      {% for name in playlists %}
+      <a class="playlist-item" href="/playlists/{{ name }}">📜 {{ name }}</a>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

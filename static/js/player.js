@@ -30,6 +30,19 @@
     cursorBlob.style.opacity = 0.2;
   });
 
+  // Sidebar nav routing (basic client-side navigation for pages loaded server-side)
+  document.querySelectorAll('.menu .menu-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const page = btn.dataset.page;
+      if (!page) return;
+      if (page === 'home') window.location.href = '/';
+      if (page === 'library') window.location.href = '/'; // same as home grid for now
+      if (page === 'playlists') window.location.href = '/playlists';
+      if (page === 'favorites') window.location.href = '/favorites';
+      if (page === 'history') window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+    });
+  });
+
   // Shooting star every ~10s
   const shootingStar = $('#shooting-star');
   setInterval(()=>{
@@ -43,7 +56,7 @@
   // Onboarding with localStorage
   const onboarding = $('#onboarding');
   const obClose = $('#onboarding-close');
-  if (localStorage.getItem('nayaraOnboardingSeen') !== 'true') {
+  if (onboarding && localStorage.getItem('nayaraOnboardingSeen') !== 'true') {
     onboarding.classList.remove('hidden');
   }
   obClose?.addEventListener('click', ()=>{
@@ -62,6 +75,7 @@
     $$('.song-card').forEach(c=>c.classList.toggle('active', Number(c.dataset.id)===id));
   }
   function updateReco(id){
+    if (!recoGrid) return;
     fetch(`/api/recommendations/${id}`).then(r=>r.json()).then(list=>{
       recoGrid.innerHTML = '';
       list.slice(0,6).forEach(s=>{
@@ -90,11 +104,26 @@
       updateReco(currentSong.song_id);
       // Nayara reaction
       const bubble = document.getElementById('nayara-bubble');
-      bubble.textContent = `Now playing: ${currentSong.title}`;
+      if (bubble) bubble.textContent = `Now playing: ${currentSong.title}`;
     })
   }
 
-  // Card buttons
+  // Favorite toggle handler (works across pages)
+  document.addEventListener('click', (e)=>{
+    const t = e.target;
+    if (t.classList && t.classList.contains('fav')){
+      const id = Number(t.dataset.id);
+      fetch(`/api/favorites/toggle/${id}`, {method:'POST'}).then(r=>r.json()).then(res=>{
+        t.textContent = res.is_favorite ? '💜' : '🤍';
+        // If on favorites page, refresh to reflect removal
+        if (window.location.pathname.startsWith('/favorites')){
+          window.location.reload();
+        }
+      })
+    }
+  });
+
+  // Card buttons (play/queue)
   songGrid?.addEventListener('click', (e)=>{
     const t = e.target;
     if (t.classList.contains('play')){
@@ -157,7 +186,6 @@
   })
 
   btnNext?.addEventListener('click', ()=>{
-    const id = currentSong?.song_id || 0;
     fetch('/api/next', {method:'POST'}).then(r=>r.json()).then(data=>{
       currentSong = data.song; audio.src = data.audio_url; audio.play(); isPlaying = true; btnPlay.textContent = '⏸';
       npTitle.textContent = currentSong.title; npArtist.textContent = currentSong.artist || 'Unknown';
